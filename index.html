@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRIMSON Server Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5fff8, #dfffea, #ffffff);
+      color: #123322;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .blob {
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: rgba(0, 180, 95, 0.18);
+      filter: blur(25px);
+      animation: floatBlob 8s infinite ease-in-out;
+      z-index: -1;
+    }
+
+    .blob.one { top: 80px; left: -80px; }
+    .blob.two { bottom: 60px; right: -70px; animation-delay: 2s; }
+
+    @keyframes floatBlob {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-35px); }
+    }
+
+    header {
+      width: 100%;
+      padding: 18px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(14px);
+      z-index: 100;
+      border-bottom: 1px solid rgba(0, 128, 64, 0.12);
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: 800;
+      color: #008f4c;
+    }
+
+    nav a {
+      color: #123322;
+      text-decoration: none;
+      margin-left: 22px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    nav a:hover { color: #00a85a; }
+
+    .hero {
+      padding: 90px 8% 60px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 72px);
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span { color: #00a85a; }
+
+    .hero p {
+      font-size: 18px;
+      line-height: 1.7;
+      max-width: 650px;
+      color: #315241;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      transition: 0.3s;
+      display: inline-block;
+    }
+
+    .btn.primary {
+      background: #00a85a;
+      color: white;
+      box-shadow: 0 12px 30px rgba(0, 168, 90, 0.28);
+    }
+
+    .btn.secondary {
+      border: 2px solid #00a85a;
+      color: #00a85a;
+      background: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px);
+    }
+
+    .floating-card {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(0, 168, 90, 0.18);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 25px 55px rgba(0, 90, 45, 0.14);
+      animation: floatCard 4s infinite ease-in-out;
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .server-box {
+      background: #081f14;
+      color: #c9ffe1;
+      padding: 20px;
+      border-radius: 20px;
+      font-family: Consolas, monospace;
+      line-height: 1.8;
+      margin-top: 18px;
+      overflow: hidden;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 7px 13px;
+      background: #d9ffe9;
+      color: #008f4c;
+      border-radius: 999px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    section {
+      padding: 65px 8%;
+    }
+
+    .section-title {
+      font-size: 38px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: #426454;
+      max-width: 720px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 168, 90, 0.14);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 14px 35px rgba(0, 90, 45, 0.08);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 22px 45px rgba(0, 90, 45, 0.14);
+    }
+
+    .card h3 {
+      color: #008f4c;
+      margin-bottom: 12px;
+      font-size: 22px;
+    }
+
+    .card p, .card li {
+      color: #426454;
+      line-height: 1.6;
+    }
+
+    ul { padding-left: 20px; }
+
+    .price {
+      font-size: 34px;
+      color: #00a85a;
+      font-weight: 900;
+      margin: 15px 0;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #e7fff1;
+      color: #008f4c;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .about-box {
+      max-width: 1000px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      padding: 35px;
+      border: 1px solid rgba(0, 168, 90, 0.14);
+      box-shadow: 0 20px 45px rgba(0, 90, 45, 0.1);
+      line-height: 1.8;
+      color: #315241;
+    }
+
+    .contact {
+      text-align: center;
+      background: linear-gradient(135deg, #00a85a, #007a43);
+      color: white;
+      border-radius: 35px;
+      margin: 40px 8%;
+      padding: 55px 25px;
+      box-shadow: 0 25px 55px rgba(0, 128, 64, 0.25);
+    }
+
+    .contact h2 {
+      font-size: 38px;
+      margin-bottom: 15px;
+    }
+
+    .discord-name {
+      display: inline-block;
+      background: white;
+      color: #008f4c;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-weight: 900;
+      margin-top: 18px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #426454;
+      font-size: 14px;
+    }
+
+    @media (max-width: 850px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 60px;
+      }
+
+      nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob one"></div>
+  <div class="blob two"></div>
+
+  <header>
+    <div class="logo">CRIMSON Servers</div>
+    <nav>
+      <a href="#services">Services</a>
+      <a href="#plans">Plans</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <h1>Minecraft Server <span>Management</span> Made Easy</h1>
+        <p>
+          Need a clean SMP setup, plugin fixing, ranks, kits, scoreboard, Discord integration, or lag optimization?
+          CRIMSON Servers helps Minecraft owners build better servers with simple, affordable support.
+        </p>
+        <div class="buttons">
+          <a class="btn primary" href="#plans">View Packages</a>
+          <a class="btn secondary" href="#contact">Contact on Discord</a>
+        </div>
+      </div>
+
+      <div class="floating-card">
+        <span class="status">● Available for Orders</span>
+        <h2>Live Setup Panel</h2>
+        <div class="server-box">
+          > Paper server detected<br>
+          > Installing EssentialsX... done<br>
+          > Configuring LuckPerms... done<br>
+          > Scoreboard enabled<br>
+          > Discord support ready<br>
+          > Server status: optimized
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <h2 class="section-title">Services</h2>
+      <p class="section-subtitle">
+        Everything below is focused on helping new and small Minecraft server owners get a better setup without confusion.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Server Setup</h3>
+          <p>Paper/Purpur server setup, basic files, EULA, server.properties, and clean starting configuration.</p>
+        </div>
+        <div class="card">
+          <h3>Plugin Management</h3>
+          <p>EssentialsX, LuckPerms, DeluxeMenus, Scoreboard, TAB, Holograms, Shops, and more.</p>
+        </div>
+        <div class="card">
+          <h3>Ranks & Kits</h3>
+          <p>Owner, Admin, Mod, VIP-style groups, permissions, prefixes, starter kits, and premium kits.</p>
+        </div>
+        <div class="card">
+          <h3>Discord Setup</h3>
+          <p>Discord server roles, channels, bots, and basic Minecraft-to-Discord integration guidance.</p>
+        </div>
+        <div class="card">
+          <h3>Lag Fixing</h3>
+          <p>Basic performance settings, plugin cleanup, view distance suggestions, and TPS-friendly setup.</p>
+        </div>
+        <div class="card">
+          <h3>Error Fixing</h3>
+          <p>Help with startup errors, broken configs, permission issues, plugin conflicts, and console problems.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="plans">
+      <h2 class="section-title">Packages</h2>
+      <p class="section-subtitle">Starter prices. You can change these anytime as your experience grows.</p>
+
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Basic</span>
+          <h3>Starter Setup</h3>
+          <div class="price">₹49</div>
+          <ul>
+            <li>Paper server setup</li>
+            <li>5 basic plugins</li>
+            <li>Basic permissions</li>
+            <li>Simple rules setup</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <span class="tag">Popular</span>
+          <h3>SMP Pro Setup</h3>
+          <div class="price">₹99</div>
+          <ul>
+            <li>Everything in Starter</li>
+            <li>Ranks and prefixes</li>
+            <li>Kits setup</li>
+            <li>Scoreboard / TAB setup</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <span class="tag">Advanced</span>
+          <h3>Ultimate Server Setup</h3>
+          <div class="price">₹199+</div>
+          <ul>
+            <li>Full SMP setup</li>
+            <li>Holograms and shops</li>
+            <li>Discord guidance</li>
+            <li>Optimization suggestions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2 class="section-title">About Us</h2>
+      <div class="about-box">
+        <p>
+          CRIMSON Servers is a small Minecraft server management service created by <b>「CRIMSON」Amrit</b>.
+          The goal is simple: help Minecraft players create better SMPs with clean plugins, ranks, kits, Discord setup,
+          and error fixing.
+        </p>
+        <br />
+        <p>
+          Current experience includes Minecraft server setup, Paper server basics, plugin configuration, LuckPerms ranks,
+          Discord bot setup, scoreboard configuration, and basic lag optimization. As more real projects are completed,
+          verified client results and testimonials can be added here.
+        </p>
+        <br />
+        <p>
+          Service area: Online support available for English/Hindi-speaking Minecraft server owners. Add your real countries
+          or regions here only after you actually start serving customers from those places.
+        </p>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <h2>Ready to Build Your SMP?</h2>
+      <p>Message me on Discord for setup, plugin fixing, or server management support.</p>
+      <div class="discord-name">Discord Username: xxnot_amritx</div>
+      <br />
+      <div class="discord-name">Display Name: 「CRIMSON」Amrit</div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 CRIMSON Servers. Minecraft is a trademark of Mojang/Microsoft. This is an independent service.
+  </footer>
+</body>
+</html>
